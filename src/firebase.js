@@ -17,6 +17,7 @@ export const auth = firebase.auth();
 export const database = {
   users: firestore.collection("users"),
   products: firestore.collection("products"),
+  getCurrentTimestamp: firebase.firestore.FieldValue.serverTimestamp,
 };
 
 export default app;

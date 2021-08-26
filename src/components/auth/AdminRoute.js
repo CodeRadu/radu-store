@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Redirect, Route } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { database } from "../../firebase";
+import Loading from "../Loading";
 
 function GuestRoute({ component: Component, ...rest }) {
   const { currentUser } = useAuth();
@@ -29,11 +30,15 @@ function GuestRoute({ component: Component, ...rest }) {
         <Route
           {...rest}
           render={(props) => {
-            return admin ? <Component {...props} /> : <Redirect to="/" />;
+            return admin && currentUser ? (
+              <Component {...props} />
+            ) : (
+              <Redirect to="/" />
+            );
           }}
         />
       ) : (
-        "Loading"
+        <Loading />
       )}
     </div>
   );

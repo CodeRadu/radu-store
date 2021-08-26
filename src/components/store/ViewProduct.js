@@ -1,23 +1,25 @@
-import React, { useEffect } from "react";
-import "../../css/Dashboard.css";
-import { Link } from "react-router-dom";
-import { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+import React from "react";
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import { database } from "../../firebase";
 import Loading from "../Loading";
-import { useCollectionData } from "react-firebase-hooks/firestore";
+import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "react-bootstrap";
-import Product from "./Product";
 
-function Dashboard() {
+function AdminViewProduct() {
+  const { id: productId } = useParams();
+  const [product, setProduct] = useState();
   const { logout } = useAuth();
   const [user, setUser] = useState();
-  const query = database.products.orderBy("createdAt");
-  const [products] = useCollectionData(query, { idField: "id" });
-
   const { currentUser } = useAuth();
 
   useEffect(() => {
+    database.products
+      .doc(productId)
+      .get()
+      .then((prod) => {
+        setProduct(prod.data());
+      });
     database.users
       .doc(currentUser.email)
       .get()
@@ -28,7 +30,7 @@ function Dashboard() {
 
   return (
     <div>
-      {user ? (
+      {product && user ? (
         <div>
           <header className="header">
             <h2>
@@ -44,11 +46,12 @@ function Dashboard() {
             </button>
           </header>
           <main style={{ padding: "50px 20px" }}>
-            <div className="Products">
-              <h2>Products</h2>
-              {products &&
-                products.map((product) => <Product product={product} />)}
-            </div>
+            <h2>{product.name}</h2>
+            <Link to="/">Back</Link>
+            <br />
+            Price: {product.price}$
+            <br />
+            Description: {product.description}
           </main>
         </div>
       ) : (
@@ -58,4 +61,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default AdminViewProduct;
